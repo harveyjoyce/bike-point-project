@@ -48,20 +48,24 @@ s3_client = boto3.client(
     aws_secret_access_key=aws_secret_access_key
 )
 
+# Loop through each JSON file and upload it to S3
 for json_file in json_files:
     try:
+        # Upload the file to the specified S3 bucket
         s3_client.upload_file(
-            str(json_file),
-            bucket_name,
-            json_file.name
+            str(json_file),  # File path as a string
+            bucket_name,     # S3 bucket name
+            json_file.name   # Name of the file in S3
         )
 
-        # Remove local file only after successful upload
+        # Delete the local file after successful upload
         json_file.unlink()
         logger.info(f"Uploaded and deleted: {json_file.name}")
 
+    # Handle known AWS errors
     except (BotoCoreError, ClientError) as e:
         logger.error(f"Failed to upload {json_file.name}: {e}")
 
+    # Handle any other unexpected errors
     except Exception as e:
         logger.error(f"Unexpected error with {json_file.name}: {e}")
