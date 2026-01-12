@@ -208,4 +208,6 @@ __marimo__/
 
 data
 logs
+load_logs
 *.json
+.env
