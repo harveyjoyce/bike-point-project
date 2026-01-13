@@ -207,7 +207,8 @@ marimo/_lsp/
 __marimo__/
 
 data
-logs
+*logs
 load_logs
 *.json
 .env
+.log
