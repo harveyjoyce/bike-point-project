@@ -15,11 +15,20 @@ def logging_function(prefix, timestamp):
 
     log_filename = f"{dir}/{timestamp}.log"
 
-    # Configure logs to retrieve INFO messages and higher
-    logging.basicConfig(
-        level=logging.INFO, 
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        filename=log_filename
-    )
+    # Create a unique logger for this prefix
+    logger = logging.getLogger(prefix)
+    logger.setLevel(logging.INFO)
 
-    return logging.getLogger()
+    # Check if logger already has handlers to prevent duplicate logs
+    if not logger.handlers:
+        # Create file handler
+        file_handler = logging.FileHandler(log_filename)
+        
+        # Create formatter and add it to the handler
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
+
+        # Add the handler to the logger
+        logger.addHandler(file_handler)
+
+    return logger

@@ -212,3 +212,4 @@ load_logs
 *.json
 .env
 .log
+docker
