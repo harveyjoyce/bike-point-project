@@ -1,11 +1,55 @@
-<h1>BikePoint API Data Downloader</h1>
+# BikePoint (TfL) Project 🚲
 
-<p>This project retrieves live Santander Cycle hire (BikePoint) data from the <strong>Transport for London (TfL) BikePoint API</strong>, logs execution details, stores the downloaded data locally as timestamped JSON files, and optionally uploads them to an S3 bucket.</p>
+<img align="right" alt="image" src="https://github.com/user-attachments/assets/c54d8d3a-6018-4f5f-97ae-2f5af6e904a9" width="30%"/>
 
-<p>It is based on the public TfL BikePoint API and references the following GitHub repository:<br>
-<a href="https://github.com/harveyjoyce/bikepoint-api">https://github.com/harveyjoyce/bikepoint-api</a></p>
+This project: 
+- Retrieves live Santander Cycle hire (BikePoint) data from the **[Transport for London (TfL) BikePoint API](https://api.tfl.gov.uk/swagger/ui/index.html#!/BikePoint/BikePoint_GetAll)**
+- Logs execution details, stores the downloaded data locally as timestamped JSON files
+- Uploads them to an S3 bucket in **AWS** which connects to **Snowflake**
+- **dbt** is used to parse out the raw JSON 
 
-<hr>
+## Project Overview Diagram 🎨
+
+<img width="3452" height="1323" alt="image" src="https://github.com/user-attachments/assets/030140a4-2b3c-40d2-8bbf-780bdabf41a7" />
+
+## Setting up the Repository ⚙️
+
+1. Clone this repository:
+
+```bash
+git clone https://github.com/yourusername/bike-point-project.git
+```
+
+2. Create a branch
+
+```bash
+git checkout -b your-branch-name
+```
+
+3. Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+# Linux / Mac
+source .venv/bin/activate
+# Windows
+.venv\Scripts\activate
+```
+
+3. Install required packages
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Add a .env file in the root of the project containing your AWS credentials (After setting up an appropriate IAM User and S3 Bucket):
+
+```
+aws_access_key_id = ' '
+aws_secret_access_key = ' '
+bucket_name = ' '
+```
+
 
 <h2>Features</h2>
 <ul>
