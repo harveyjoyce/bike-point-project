@@ -50,59 +50,33 @@ aws_secret_access_key = ' '
 bucket_name = ' '
 ```
 
+## Project Structure 👷‍♂️
 
-<h2>Features</h2>
-<ul>
-  <li>Fetches real-time BikePoint data from TfL</li>
-  <li>Automatic retry logic for failed API requests</li>
-  <li>Saves API responses as timestamped JSON files</li>
-  <li>Generates structured log files for monitoring and debugging</li>
-  <li>Automatically creates required directories (<code>data/</code> and <code>logs/</code>)</li>
-  <li><strong>Optional:</strong> Uploads JSON files to AWS S3 and deletes local copies after successful upload</li>
-</ul>
-
-<hr>
-
-<h2>Project Structure</h2>
-<pre><code>.
+```
 ├── data/
 │   └── YYYY-MM-DD HH-MM-SS.json
-├── logs/
+├── extract_logs/
 │   └── YYYY-MM-DD HH-MM-SS.log
 ├── load_logs/
 │   └── YYYY-MM-DD HH-MM-SS.log
-├── extract_bike_points.py
-├── load_bike_points.py
+├── main.py
+├── modules/
+│   └── logging.py
+│   └── extract.py
+│   └── load.py
+├── archive/
+│   └── extract_bike_points.py
+│   └── load_bike_points.py
+├── .env
 └── README.md
-</code></pre>
+```
 
-<hr>
+## How It Works 🔨
 
-<h2>Requirements</h2>
-<ul>
-  <li>Python 3.8+</li>
-  <li>Internet connection</li>
-  <li>AWS account and S3 bucket (for <code>load_bike_points.py</code>)</li>
-</ul>
+main.py
+- This is the main script you run.
 
-<h3>Python Dependencies</h3>
-<pre><code>pip install requests boto3 python-dotenv</code></pre>
-<p>(Standard library modules used: <code>os</code>, <code>json</code>, <code>datetime</code>, <code>time</code>, <code>logging</code>, <code>pathlib</code>)</p>
 
-<hr>
-
-<h2>Environment Variables (for S3 Upload)</h2>
-<p>Create a <code>.env</code> file in the project root directory:</p>
-<pre><code>aws_access_key_id=YOUR_AWS_ACCESS_KEY_ID
-aws_secret_access_key=YOUR_AWS_SECRET_ACCESS_KEY
-bucket_name=YOUR_S3_BUCKET_NAME</code></pre>
-<p><code>extract_bike_points.py</code> does not require credentials. <code>load_bike_points.py</code> uses these AWS credentials for authentication.</p>
-
-<hr>
-
-<h2>How It Works</h2>
-
-<h3>Script A – Download BikePoint Data (<code>extract_bike_points.py</code>)</h3>
 <ol>
   <li>Sends a GET request to the TfL BikePoint API: <code>https://api.tfl.gov.uk/BikePoint</code></li>
   <li>Retries the request up to <strong>3 times</strong> if an unsuccessful response is received</li>
@@ -180,15 +154,6 @@ bucket_name=YOUR_S3_BUCKET_NAME</code></pre>
 </ul>
 
 <hr>
-
-<h2>Future Improvements</h2>
-<ul>
-  <li>Add environment variable support for TfL API credentials</li>
-  <li>Schedule automated runs using cron or Task Scheduler</li>
-  <li>Store data in CSV format or a database</li>
-  <li>Add unit tests and CI/CD integration</li>
-  <li>Add notification system on upload failures</li>
-</ul>
 
 <hr>
 
