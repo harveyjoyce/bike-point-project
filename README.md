@@ -73,90 +73,48 @@ bucket_name = ' '
 
 ## How It Works 🔨
 
-main.py
-- This is the main script you run.
+**main.py**
 
+This script acts as the orchestrator for a data pipeline, likely moving BikePoint data to S3. Here is what it's doing:
+- Environment & Setup: It loads secure credentials (AWS keys) from a .env file and initialises two distinct logging sessions—one for `extract` and one for `load`—using the current timestamp.
+- Data Extraction: It triggers a process to fetch bike point data from the TfL API and passes the `extract_logger` to track the success or failure of that specific task.
+- Cloud Loading: It takes the locally saved data from a data folder and uploads it to a specified AWS S3 bucket, using the `load_logger` to record the transfer details.
 
-<ol>
-  <li>Sends a GET request to the TfL BikePoint API: <code>https://api.tfl.gov.uk/BikePoint</code></li>
-  <li>Retries the request up to <strong>3 times</strong> if an unsuccessful response is received</li>
-  <li>On success:
-    <ul>
-      <li>Saves the response as a JSON file in the <code>data/</code> directory</li>
-      <li>Creates a timestamped log file in the <code>logs/</code> directory</li>
-    </ul>
-  </li>
-  <li>Logs system activity at INFO level and above</li>
-</ol>
+**logging.py**
 
-<h3>Script B – Upload JSON to S3 (<code>load_bike_points.py</code>)</h3>
-<ol>
-  <li>Loads AWS credentials from <code>.env</code></li>
-  <li>Searches for all JSON files in the <code>data/</code> directory</li>
-  <li>Raises an error if no files are found</li>
-  <li>Uploads each JSON file to the specified S3 bucket</li>
-  <li>Deletes local JSON files after a successful upload</li>
-  <li>Logs all upload actions and errors to timestamped files in <code>load_logs/</code></li>
-</ol>
+This script sets up a reusable logging system in Python. Here is the breakdown of what it’s doing:
+- Creates a Directory: It automatically generates a folder named after your prefix (if it doesn't already exist) to store your log files.
+- Initialises a File Logger: It creates a specific .log file named with your timestamp and configures it to record messages at the INFO level.
+- Prevents Duplication: It checks for existing "handlers" before adding new ones, ensuring your logs don't accidentally double-post the same message to the file.
 
-<hr>
+**extract.py**
 
-<h2>Logging</h2>
-<p>Each script execution creates a log file containing:</p>
-<ul>
-  <li>System status messages</li>
-  <li>Successful downloads/uploads</li>
-  <li>Warnings and errors</li>
-  <li>Critical failures</li>
-</ul>
+This script handles the extraction and storage phase of your pipeline with built-in error handling. Here is what’s happening:
+- API Request with Retry Logic: It attempts to fetch data from the provided URL and is programmed to retry up to a specific number of times if it encounters server errors (status codes 500+) or connection issues.
+- JSON File Management: Upon a successful "200 OK" response, it ensures a `data` directory exists and saves the API results as a local .json file named after the current timestamp.
+- Success and Error Logging: It records the outcome of the attempt—logging a success message and a "😊" emoji to your log file if it works, or capturing the failure reason if the request hits a permanent error (like a 404).
+- It will try 3 times in total, waiting 10 seconds each go (`time.sleep(10)`).
 
-<p>Example log entry:</p>
-<pre><code>2026-01-07 12:30:01 - INFO - Download successful at 2026-01-07 12-30-01 😊
+**load.py**
+
+This script handles the loading and cleanup phase of your pipeline, moving local data to the cloud. Here is what it’s doing:
+- File Discovery & Validation: It scans the `data` directory for all files ending in .json; if it doesn't find any, it logs an error and stops the process to prevent unnecessary cloud connections.
+- S3 Cloud Upload: Using the `boto3` library, it establishes a connection to AWS and uploads each JSON file to your specified S3 bucket using the original filename.
+- Cleanup & Error Logging: After a successful upload, it deletes the local file (`unlink`) to save space; if an upload fails due to AWS permissions or network issues, it catches the error and logs it without crashing the entire loop.
+
+## Logging 📝
+Each script execution creates a log file containing:
+- System status messages
+- Successful downloads/uploads
+- Warnings and errors
+- Critical failures
+
+Example log entry:
+```
+2026-01-07 12:30:01 - INFO - Download successful at 2026-01-07 12-30-01 😊
 2026-01-07 12:35:15 - INFO - Uploaded and deleted: 2026-01-07 12-30-01.json
-</code></pre>
+```
 
-<hr>
-
-<h2>Usage</h2>
-
-<h3>Download BikePoint Data</h3>
-<pre><code>python extract_bike_points.py</code></pre>
-<p>On successful execution:</p>
-<ul>
-  <li>A JSON file will be saved in the <code>data/</code> folder</li>
-  <li>A log file will be saved in the <code>logs/</code> folder</li>
-  <li>A success message will be printed to the console</li>
-</ul>
-
-<h3>Upload JSON Files to S3</h3>
-<pre><code>python load_bike_points.py</code></pre>
-<p>On successful execution:</p>
-<ul>
-  <li>JSON files will be uploaded to your S3 bucket</li>
-  <li>Local copies of the files will be deleted</li>
-  <li>A log file will be saved in the <code>load_logs/</code> folder</li>
-</ul>
-
-<hr>
-
-<h2>API Reference</h2>
-<p>TfL BikePoint API documentation:<br>
-<a href="https://api.tfl.gov.uk/swagger/ui/#!/BikePoint/BikePoint_GetAll">https://api.tfl.gov.uk/swagger/ui/#!/BikePoint/BikePoint_GetAll</a></p>
-
-<hr>
-
-<h2>Error Handling</h2>
-<ul>
-  <li>HTTP status codes outside the successful range trigger a retry</li>
-  <li>Requests time out after 10 seconds</li>
-  <li>All errors are logged for troubleshooting</li>
-  <li>S3 upload errors are logged, and execution stops if no JSON files are found</li>
-</ul>
-
-<hr>
-
-<hr>
-
-<h2>License</h2>
-<p>This project uses public TfL API data and is intended for educational and non-commercial use.<br>
-Please refer to TfL’s API terms and conditions for usage guidelines.</p>
+## License 🪪 
+This project uses public TfL API data and is intended for educational and non-commercial use.
+Please refer to TfL’s API terms and conditions for usage guidelines.
