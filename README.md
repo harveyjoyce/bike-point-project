@@ -116,5 +116,37 @@ Example log entry:
 ```
 
 ## License 🪪 
+
 This project uses public TfL API data and is intended for educational and non-commercial use.
 Please refer to TfL’s API terms and conditions for usage guidelines.
+
+## Configuring AWS 🟧 and Snowflake ❄️
+
+To connect to Snowflake from AWS, you need to create an IAM Role and Storage Intergration. I have written a blog [here](https://www.thedataschool.co.uk/harvey-joyce/connecting-snowflake-and-aws-s3-storage-integration-and-procedures/) on how to set that up!
+
+## dbt Project Structure 🟠
+
+```
+├── analyses/             # SQL files for one-off exports or ad-hoc queries
+├── macros/               # Reusable Jinja functions (like custom aggregations)
+├── models/               # The heart of your project
+│   ├── staging/          # Raw data cleaning (renaming, type casting)
+│   │   └── bike_point/   # Organized by source system (e.g., stripe, hubspot)
+│   │       ├── base/
+│   │       │    └── base_bike_point__parsed.sql
+│   │       ├── _bike_point__sources.yml
+│   │       └── stg_bike_point__parsed.sql
+│   ├── intermediate/     # Complex joins and business logic between staging/marts
+│   └── marts/            # Final, "gold" tables for BI tools
+│       └── bike_point/
+│           ├── bike_point_gold.sql
+│           ├── dim_bike_point.sql
+│           └── fct_bike_point.sql
+├── seeds/                # Small, static CSV files (e.g., country codes)
+├── snapshots/            # Files for tracking data changes over time (SCD Type 2)
+├── tests/                # Custom data quality tests (singular tests)
+├── dbt_project.yml       # The main configuration file for the whole project
+├── packages.yml          # External dbt libraries (like dbt-utils)
+├── profiles.yml          # Connection credentials (usually kept in ~/.dbt/)
+└── README.md
+```
