@@ -75,7 +75,7 @@ bucket_name = ' '
 
 **main.py**
 
-This script acts as the orchestrator for a data pipeline, likely moving BikePoint data to S3. Here is what it's doing:
+This script acts as the orchestrator for a data pipeline, moving BikePoint data to S3. Here is what it's doing:
 - Environment & Setup: It loads secure credentials (AWS keys) from a .env file and initialises two distinct logging sessions—one for `extract` and one for `load`—using the current timestamp.
 - Data Extraction: It triggers a process to fetch bike point data from the TfL API and passes the `extract_logger` to track the success or failure of that specific task.
 - Cloud Loading: It takes the locally saved data from a data folder and uploads it to a specified AWS S3 bucket, using the `load_logger` to record the transfer details.
