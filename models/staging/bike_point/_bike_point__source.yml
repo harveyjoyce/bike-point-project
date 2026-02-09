@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: hj_des5_bike_point
+    description: "Data from the TfL Bike Point API 'https://api.tfl.gov.uk/BikePoint'"
+    database: til_data_engineering
+    tables:
+      - name: raw_bike_point
+        description: "The raw data from the API"
+        columns:
+          - name: json
+            data_type: variant
+            description: "The JSON, with the outer array stipped"
+          - name: filename
+            data_type: varchar
+            description: "The filename contains the extraction time as a string"
