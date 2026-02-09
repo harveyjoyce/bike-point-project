@@ -115,14 +115,28 @@ Example log entry:
 2026-01-07 12:35:15 - INFO - Uploaded and deleted: 2026-01-07 12-30-01.json
 ```
 
-## License 🪪 
-
-This project uses public TfL API data and is intended for educational and non-commercial use.
-Please refer to TfL’s API terms and conditions for usage guidelines.
-
 ## Configuring AWS 🟧 and Snowflake ❄️
 
 To connect to Snowflake from AWS, you need to create an IAM Role and Storage Intergration. I have written a blog [here](https://www.thedataschool.co.uk/harvey-joyce/connecting-snowflake-and-aws-s3-storage-integration-and-procedures/) on how to set that up!
+
+In Snowflake, I also created a pipe to handle automatic data loading from S3.
+
+``` sql
+create or replace pipe <name> auto_ingest = true as 
+copy into raw_bike_point (raw_json, filename)
+from 
+(select  
+    $1, 
+    metadata$filename
+from @bike_point_stage)
+file_format = (
+        type = 'JSON'
+        strip_outer_array = TRUE
+        )
+```
+After, if you query `show pipes` you will find your pipe's `notification_channel` code, it will look like this: `arn:aws:sqs:eu-west-2:...`.
+
+If you got to your bucket in AWS, go to Properties and scroll down to Event Notifications, you can set up the pipe to run every time there is new data in the bucket.
 
 ## dbt Project Structure 🟠
 
@@ -150,3 +164,23 @@ To connect to Snowflake from AWS, you need to create an IAM Role and Storage Int
 ├── profiles.yml          # Connection credentials (usually kept in ~/.dbt/)
 └── README.md
 ```
+## Data Model 🗺️
+
+<img width="3452" height="1323" alt="image" src="https://github.com/user-attachments/assets/a6f8f034-a4c4-4c2e-9a4f-61fd20569461" />
+
+### fct_bike_point: 
+- This is a fact table that records the number of bikes, docks, e-bikes at each BikePoint location
+- We're not updating any existing data so we use an incremental append.
+
+### dim_bike_point:
+- This is a dimension table that has qualitative infomation about each BikePoint (e.g Name, Location etc)
+- There are a few columns that we want to update but not record the history of changes (e.g removaldate). We can use a snapshot table to do this.
+
+### bike_point_gold 🏅
+- The API documentation mentions that if `nbdocks - (nbemptydocks + nbbikes)` is negative then that BikePoint has broken docks.
+- This is a simple view that shows what BikePoints have broken docks and where they are located.
+
+## License 🪪 
+
+This project uses public TfL API data and is intended for educational and non-commercial use.
+Please refer to TfL’s API terms and conditions for usage guidelines.
