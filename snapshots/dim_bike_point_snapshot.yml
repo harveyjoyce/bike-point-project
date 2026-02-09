@@ -1,0 +1,14 @@
+snapshots:
+  - name: dim_bike_point_snapshot
+    relation: ref('dim_bike_point')
+    description: "Creates a SCD2 of our Bike Point dim"
+    config:
+      strategy: check
+      unique_key: id
+      check_cols:
+        - installed
+        - locked
+        - installdate
+        - removaldate
+        - temporary
+      dbt_valid_to_current: "to_date('9999-12-31')"
