@@ -50,7 +50,7 @@ aws_secret_access_key = ' '
 bucket_name = ' '
 ```
 
-## Project Structure 👷‍♂️
+## Python Project Structure 👷‍♂️
 
 ```
 ├── data/
